@@ -9,7 +9,7 @@ spec:
   - host: localhost
     http:
       paths:
-      - path: /guestbook
+      - path: /guestbook*
         pathType: Prefix
         backend:
           service:
