@@ -2,10 +2,11 @@ LOADBALANCER_PORT=8080
 ARGOCD_PORT=8082
 APP_PORT=8083
 
-remove-k3d:
+k3d-remove:
 	k3d cluster delete argocd-test
 
-init-k3d:
+# k3d uses Traefik as ingress
+k3d-init:
 	k3d cluster create argocd-test --api-port 6443 -p ${LOADBALANCER_PORT}:80@loadbalancer --agents 2
 	k3d kubeconfig merge argocd-test
 
@@ -34,3 +35,15 @@ argo-sync-service:
 
 argo-expose-service:
 	kubectl port-forward svc/guestbook-ui -n default ${APP_PORT}:80
+
+
+argo-create-nginx-service:
+	argocd app create guestbook \
+		--repo https://github.com/luizamboni/k3d-argocd-study.git \
+		--path nginx \
+		--dest-server https://kubernetes.default.svc \
+		--dest-namespace default
+	argocd app sync nginx
+
+# argo-expose-service:
+# 	kubectl port-forward svc/guestbook-ui -n default ${APP_PORT}:80
