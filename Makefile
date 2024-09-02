@@ -10,8 +10,22 @@ remove-k3d:
 init-k3d:
 	k3d cluster create argocd-test --api-port 6443 -p 8080:80@loadbalancer --agents 2
 	k3d kubeconfig merge argocd-test
-	kubectl create namespace argocd	
 
 install-argocd:
-	kubectl apply -f argocd/install.yaml -n argocd 
-# kubectl apply -f argocd/ingress.yaml -n argocd 
+	kubectl create namespace argocd	
+	helm repo add argo https://argoproj.github.io/argo-helm
+	helm install argocd argo/argo-cd --namespace argocd
+	kubectl port-forward svc/argocd-server -n argocd 8081:443
+
+
+login:
+	argocd admin initial-password -n argocd
+	argocd login localhost:8001
+
+
+create-service:
+	argocd app create guestbook \
+		--repo git@github.com:luizamboni/k3d-argocd-study.git \
+		--path guestbook \
+		--dest-server https://kubernetes.default.svc \
+		--dest-namespace default
