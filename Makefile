@@ -1,31 +1,36 @@
-# kubectl -n argocd patch secret argocd-secret
-#   -p '{"stringData":  {
-#     "admin.password": "$2y$12$Kg4H0rLL/RVrWUVhj6ykeO3Ei/YqbGaqp.jAtzzUSJdYWT6LUh/n6",
-#     "admin.passwordMtime": "'$(date +%FT%T%Z)'"
-#   }}'
+LOADBALANCER_PORT=8080
+ARGOCD_PORT=8082
+APP_PORT=8083
 
 remove-k3d:
 	k3d cluster delete argocd-test
 
 init-k3d:
-	k3d cluster create argocd-test --api-port 6443 -p 8080:80@loadbalancer --agents 2
+	k3d cluster create argocd-test --api-port 6443 -p ${LOADBALANCER_PORT}:80@loadbalancer --agents 2
 	k3d kubeconfig merge argocd-test
 
-install-argocd:
+argo-install:
 	kubectl create namespace argocd	
 	helm repo add argo https://argoproj.github.io/argo-helm
 	helm install argocd argo/argo-cd --namespace argocd
-	kubectl port-forward svc/argocd-server -n argocd 8081:443
+	sleep 5
+	kubectl port-forward svc/argocd-server -n argocd ${ARGOCD_PORT}:443
 
 
-login:
+argo-login:
 	argocd admin initial-password -n argocd
-	argocd login localhost:8081
+	argocd login localhost:${ARGOCD_PORT}
 
 
-create-service:
+argo-create-service:
 	argocd app create guestbook \
 		--repo https://github.com/luizamboni/k3d-argocd-study.git \
 		--path guestbook \
 		--dest-server https://kubernetes.default.svc \
 		--dest-namespace default
+
+argo-sync-service:
+	argocd app sync guestbook
+
+argo-expose-service:
+	kubectl port-forward svc/guestbook-ui -n default ${APP_PORT}:80
