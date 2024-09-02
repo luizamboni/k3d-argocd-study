@@ -47,9 +47,9 @@ argo-create-nginx-service:
 	argocd app sync nginx
 
 argo-create-guestbook-with-ingress:
-	argocd app create questbook-with-ingress \
+	argocd app create guestbook-with-ingress \
 		--repo https://github.com/luizamboni/k3d-argocd-study.git \
-		--path questbook-with-ingress \
+		--path guestbook-with-ingress \
 		--dest-server https://kubernetes.default.svc \
 		--dest-namespace default
-	argocd app sync questbook-with-ingress
+	argocd app sync guestbook-with-ingress
