@@ -20,12 +20,12 @@ install-argocd:
 
 login:
 	argocd admin initial-password -n argocd
-	argocd login localhost:8001
+	argocd login localhost:8081
 
 
 create-service:
 	argocd app create guestbook \
-		--repo git@github.com:luizamboni/k3d-argocd-study.git \
+		--repo https://github.com/luizamboni/k3d-argocd-study.git \
 		--path guestbook \
 		--dest-server https://kubernetes.default.svc \
 		--dest-namespace default
