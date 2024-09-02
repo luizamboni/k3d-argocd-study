@@ -1,4 +1,4 @@
-LOADBALANCER_PORT=8080
+LOADBALANCER_PORT=80
 ARGOCD_PORT=8082
 APP_PORT=8083
 
@@ -37,6 +37,7 @@ argo-expose-service:
 	kubectl port-forward svc/guestbook-ui -n default ${APP_PORT}:80
 
 
+
 argo-create-nginx-service:
 	argocd app create nginx \
 		--repo https://github.com/luizamboni/k3d-argocd-study.git \
@@ -45,5 +46,10 @@ argo-create-nginx-service:
 		--dest-namespace default
 	argocd app sync nginx
 
-# argo-expose-service:
-# 	kubectl port-forward svc/guestbook-ui -n default ${APP_PORT}:80
+argo-create-guestbook-with-ingress:
+	argocd app create questbook-with-ingress \
+		--repo https://github.com/luizamboni/k3d-argocd-study.git \
+		--path questbook-with-ingress \
+		--dest-server https://kubernetes.default.svc \
+		--dest-namespace default
+	argocd app sync questbook-with-ingress
