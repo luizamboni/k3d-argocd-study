@@ -38,7 +38,7 @@ argo-expose-service:
 
 
 argo-create-nginx-service:
-	argocd app create guestbook \
+	argocd app create nginx \
 		--repo https://github.com/luizamboni/k3d-argocd-study.git \
 		--path nginx \
 		--dest-server https://kubernetes.default.svc \
