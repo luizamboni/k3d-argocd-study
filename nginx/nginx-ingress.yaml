@@ -9,7 +9,7 @@ spec:
   - host: localhost
     http:
       paths:
-      - path: /nginx*
+      - path: /nginx
         pathType: Prefix
         backend:
           service:
