@@ -1,21 +1,48 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: nginx-ingress
+
+# spec:
+#   rules:
+#   - host: localhost
+#     http:
+#       paths:
+#       - path: /nginx
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: nginx-service
+#             port:
+#               number: 80
+
+
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: stripnginx
+spec:
+  stripPrefix:
+    prefixes:
+      - "/nginx"
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: nginx-ingress
-  annotations:
-    # nginx.ingress.kubernetes.io/rewrite-target: /
-    traefik.ingress.kubernetes.io/router.entrypoints: web 
-    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
-
 spec:
-  rules:
-  - host: localhost
-    http:
-      paths:
-      - path: /nginx
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-service
-            port:
-              number: 80
+  entryPoints:
+    web:
+      address: ":80"
+    websecure:
+      address: ":443"
+
+  routes:
+  - match: PathPrefix(`/nginx`)
+    middlewares:
+    - name: stripnginx
+    kind: Rule
+    services:
+    - name: nginx-service
+      port: 80

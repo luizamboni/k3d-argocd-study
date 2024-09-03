@@ -31,8 +31,10 @@ metadata:
   name: guestbook-ingress
 spec:
   entryPoints:
-    # Entrypoint in Traefik. Web is port 8000
-    - web
+    web:
+      address: ":80"
+    websecure:
+      address: ":443"
   routes:
   - match: PathPrefix(`/guestbook`)
     middlewares:

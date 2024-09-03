@@ -53,3 +53,7 @@ argo-create-guestbook-with-ingress:
 		--dest-server https://kubernetes.default.svc \
 		--dest-namespace default
 	argocd app sync guestbook-with-ingress
+
+
+k3d-expose-traefik:
+	kubectl port-forward svc/traefik-dashboard -n kube-system 9000:9000
