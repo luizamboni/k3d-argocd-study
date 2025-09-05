@@ -1,6 +1,12 @@
 ArgoCd study
 ===
 
-Dependencies
+# Dependencies
 - K3d
 - helm
+- argocd
+- kubectl
+
+```shell
+kubectl get svc -A
+```
