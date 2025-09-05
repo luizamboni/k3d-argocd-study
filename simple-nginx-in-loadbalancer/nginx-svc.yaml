@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: dev
+spec:
+  selector:
+    app: nginx-simple
+  type: ClusterIP # é o default
+  ports:
+    - name: http # sem isso da ruim
+      port: 80
+      targetPort: 80
+      protocol: TCP

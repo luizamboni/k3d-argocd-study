@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: dev
+spec:
+  replicas: 3
+  # replicas: 1 # 1 porque é o highlander
+  selector: 
+    matchLabels: 
+      app: nginx-simple
+  template:
+    metadata: 
+      labels: 
+        app: nginx-simple
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable
+          ports:
+            - name: http
+              containerPort: 80
