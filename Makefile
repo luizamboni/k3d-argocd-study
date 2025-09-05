@@ -13,7 +13,7 @@ k3d-init:
 argo-install:
 	kubectl create namespace argocd	
 	helm repo add argo https://argoproj.github.io/argo-helm
-	helm install argocd argo/argo-cd --namespace argocd
+	helm install argocd argo/argo-cd --version 4.10.9 --namespace argocd
 	sleep 5
 	kubectl port-forward svc/argocd-server -n argocd ${ARGOCD_PORT}:443
 
