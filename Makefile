@@ -22,9 +22,13 @@ check-services:
 argo-forward:
 	kubectl port-forward svc/argocd-server -n argocd ${ARGOCD_PORT}:443
 
+# need to expose port with "argo-forward" before
 argo-login:
-	argocd admin initial-password -n argocd
-	argocd login localhost:${ARGOCD_PORT} 
+	kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d > /tmp/argocdpass.txt
+	yes | argocd login localhost:${ARGOCD_PORT} \
+		--username admin \
+		--password $(shell cat /tmp/argocdpass.txt)
+
 
 argo-create-service:
 	argocd app create guestbook \
