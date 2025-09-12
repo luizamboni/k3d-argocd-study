@@ -1,0 +1,32 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+  namespace: dev
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment      # This HPA will manage the "nginx-deployment " Deployment
+  minReplicas: 1 
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60 
+  behavior:   # Optional: control scale up/down behavior
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Percent
+          value: 100             # Can double the replicas at most
+          periodSeconds: 40      # Every 60s
+    scaleDown:
+      stabilizationWindowSeconds: 30 # Wait 30 sec before scaling down
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60

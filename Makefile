@@ -71,12 +71,19 @@ k8-nginx-example:
 	kubectl apply -f simple-nginx-in-loadbalancer/nginx-svc.yaml
 	sleep 2
 	kubectl apply -f simple-nginx-in-loadbalancer/nginx-ingress.yaml
+	sleep 2
+	kubectl apply -f simple-nginx-in-loadbalancer/pod-autoscaler.yaml
+
 
 remove-k8-nginx-example:
 	kubectl delete -f simple-nginx-in-loadbalancer/namespace.yaml --ignore-not-found
 	kubectl delete -f simple-nginx-in-loadbalancer/nginx-deployment.yaml --ignore-not-found
 	kubectl delete -f simple-nginx-in-loadbalancer/nginx-svc.yaml --ignore-not-found
 	kubectl delete -f simple-nginx-in-loadbalancer/nginx-ingress.yaml --ignore-not-found
+	kubectl delete -f simple-nginx-in-loadbalancer/pod-autoscaler.yaml --ignore-not-found
+
+watch-nginx-autoscaler:
+	kubectl get hpa -n dev -w
 
 inspect-ingress:
 	kubectl get pods -n kube-system | grep traefik
@@ -89,3 +96,15 @@ inspect-ingress:
 #    kubectl logs -n kube-system traefik-97b44b794-45t8b
 # 	 kubectt get ingress
 #    kubectl describe ingress nginx
+
+load-test:
+	kubectl run hey \
+	--image=docker.io/williamyeh/hey:latest \
+	--restart=Never \
+	-- -z 5m -c 50 -q 50 http://nginx-service.dev.svc.cluster.local
+
+load-test-logs:
+	kubectl logs -f hey
+	kubectl logs hey --previous
+delete-load-test:
+	kubectl delete pod hey --ignore-not-found
