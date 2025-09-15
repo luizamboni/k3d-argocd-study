@@ -33,3 +33,13 @@ spec:
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
+        - name: curl
+          image: curlimages/curl:8.8.0 # second container in the same pod
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Starting curl loop...";
+              while true; do
+                curl -s http://localhost:80 || echo "nginx not ready yet";
+                sleep 5;
+              done
