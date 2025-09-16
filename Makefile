@@ -106,5 +106,6 @@ load-test:
 load-test-logs:
 	kubectl logs -f hey
 	kubectl logs hey --previous
+
 delete-load-test:
 	kubectl delete pod hey --ignore-not-found

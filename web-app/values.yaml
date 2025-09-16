@@ -1,3 +1,135 @@
-favorite:
-  drink: coffee
-  food: pizza
+# Image settings
+image:
+  repository: wiremock/wiremock
+  tag: "3.8.0"
+  pullPolicy: IfNotPresent
+
+# Release naming
+nameOverride: ""
+fullnameOverride: ""
+
+# Workload sizing
+replicaCount: 1
+
+# Service Account (use "default" unless you set a name here)
+serviceAccount:
+  name: ""
+
+# Pod metadata
+podAnnotations: {}
+podLabels: {}
+
+# Service exposure
+service:
+  type: ClusterIP
+  port: 8081
+
+# Ingress (off by default—turn on when you have a host/class)
+ingress:
+  enabled: true
+  className: "traefik"      # e.g. "nginx" or "traefik"
+  annotations: 
+    ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - paths:
+        - path: /mock
+          pathType: Prefix
+  tls: []            # e.g. [{ secretName: wiremock-tls, hosts: [wiremock.local] }]
+
+# Resources (set as needed)
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# WireMock runtime
+wiremock:
+  # CLI flags (v3). We enable templating and verbose logs by default.
+  args:
+    - "--global-response-templating"
+    - "--verbose"
+    - "--disable-banner"
+
+  # Official v3 root layout
+  rootDir: "/home/wiremock"
+  mappingsDir: "/home/wiremock/mappings"
+  filesDir: "/home/wiremock/__files"
+
+  # Storage mode: "configMap" or "pvc".
+  # Using configMap ensures mappings/__files always exist (so templates need no file-existence checks).
+  storageMode: "configMap"
+
+  # PVC settings (only used if storageMode=pvc)
+  pvc:
+    enabled: false
+    size: 1Gi
+    storageClass: ""
+    accessModes: ["ReadWriteOnce"]
+
+# Environment variables for the container (optional)
+env: []
+# - name: JAVA_OPTS
+#   value: "-Xms128m -Xmx256m"
+
+# Extra volumes/mounts (optional)
+extraVolumeMounts: []
+extraVolumes: []
+
+# --- IMPORTANT ---
+# Pre-filled mappings and files so templates don't need conditionals for existence.
+# You can safely add/remove entries here without changing templates.
+
+mappings:
+  hello-get.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPath": "/mock/hello"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": { "message": "Hello from WireMock!" }
+      }
+    }
+
+  echo-post.json: |
+    {
+      "request": {
+        "method": "POST",
+        "url": "/mock/echo",
+        "bodyPatterns": [
+          { "matchesJsonPath": "$.name" }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "transformers": ["response-template"],
+        "jsonBody": {
+          "received": "{{jsonPath request.body '$.name'}}",
+          "note": "Response templating is enabled"
+        }
+      }
+    }
+
+  static-file.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPath": "/mock/from-file"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "text/plain" },
+        "bodyFileName": "example.txt"
+      }
+    }
+
+# Small text assets for __files (binary assets: prefer PVC mode)
+files:
+  example.txt: |
+    Served from __files/example.txt
+    Timestamp: {{now}}  (note: this string isn't templated by WireMock; it's just sample text.)

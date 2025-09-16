@@ -1,0 +1,14 @@
+WireMock installed!
+
+Service:
+  {{ include "wiremock.fullname" . }} on port {{ .Values.service.port }}
+
+If you enabled ingress:
+  http{{ if .Values.ingress.tls }}s{{ end }}://{{ (first .Values.ingress.hosts).host }}/__admin
+
+Sample stubs:
+  GET /hello -> 200 {"message":"Hello from WireMock!"}
+  POST /echo {"name":"Luiz"} -> echoes name (response-template enabled)
+
+To port-forward locally:
+  kubectl port-forward svc/{{ include "wiremock.fullname" . }} 8080:{{ .Values.service.port }}

@@ -1,0 +1,16 @@
+{{- if or (eq .Values.wiremock.storageMode "pvc") .Values.wiremock.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "wiremock.fullname" . }}
+  labels:
+    {{- include "wiremock.labels" . | nindent 4 }}
+spec:
+  accessModes: {{ toJson .Values.wiremock.pvc.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.wiremock.pvc.size }}
+  {{- if .Values.wiremock.pvc.storageClass }}
+  storageClassName: {{ .Values.wiremock.pvc.storageClass }}
+  {{- end }}
+{{- end }}

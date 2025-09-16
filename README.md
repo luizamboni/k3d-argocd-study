@@ -10,3 +10,6 @@ ArgoCd study
 ```shell
 kubectl get svc -A
 ```
+
+# Helm
+helm install hello web-app --dry-run

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wiremock.fullname" . }}
+  labels:
+    {{- include "wiremock.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "wiremock.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "wiremock.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ default "default" .Values.serviceAccount.name }}
+      containers:
+        - name: wiremock
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          {{- range .Values.wiremock.args }}
+            - {{ . | quote }}
+          {{- end }}
+          env:
+          {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+          {{- if ne .Values.wiremock.storageMode "pvc" }}
+            - name: mappings
+              mountPath: {{ .Values.wiremock.mappingsDir }}
+            - name: files
+              mountPath: {{ .Values.wiremock.filesDir }}
+          {{- else }}
+            - name: wiremock-data
+              mountPath: {{ .Values.wiremock.rootDir }}
+          {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /__admin/mappings
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /__admin
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      {{- if ne .Values.wiremock.storageMode "pvc" }}
+        - name: mappings
+          configMap:
+            name: {{ include "wiremock.fullname" . }}-mappings
+        - name: files
+          configMap:
+            name: {{ include "wiremock.fullname" . }}-files
+      {{- else }}
+        - name: wiremock-data
+          persistentVolumeClaim:
+            claimName: {{ include "wiremock.fullname" . }}
+      {{- end }}
+      {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}

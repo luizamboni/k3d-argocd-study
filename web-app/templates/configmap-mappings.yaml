@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wiremock.fullname" . }}-mappings
+  labels:
+    {{- include "wiremock.labels" . | nindent 4 }}
+data:
+{{- range $name, $content := .Values.mappings }}
+  {{ $name }}: |
+{{ $content | indent 4 }}
+{{- end }}
