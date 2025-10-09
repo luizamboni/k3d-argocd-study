@@ -17,3 +17,21 @@ web-app:
     tls: []
   wiremock:
     storageMode: configMap
+
+
+
+mappings:
+  hello-get.json: |
+    {
+      "request": {
+        "method": "GET",
+        "urlPath": "/mock/hello"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": { "message": "Hello from WireMock umbrella!" }
+      }
+    }
