@@ -1,0 +1,19 @@
+# Values for the web-app-umbrella chart.
+# Everything under `web-app` is passed directly to the dependent web-app chart.
+web-app:
+  image:
+    repository: wiremock/wiremock
+    tag: "3.8.0"
+    pullPolicy: IfNotPresent
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      ingress.kubernetes.io/ssl-redirect: "false"
+    hosts:
+      - paths:
+          - path: /mock
+            pathType: Prefix
+    tls: []
+  wiremock:
+    storageMode: configMap

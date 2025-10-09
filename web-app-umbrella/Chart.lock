@@ -1,0 +1,6 @@
+dependencies:
+- name: web-app
+  repository: file://../web-app
+  version: 0.2.0
+digest: sha256:0db397c8fe44a93dbce93a8e86e3ca0a36e4beb64ab25bc8f0cec7f9f9f5219d
+generated: "2025-10-09T15:02:36.158075-03:00"
