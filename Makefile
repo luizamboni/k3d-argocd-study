@@ -54,6 +54,15 @@ argo-create-nginx-service:
 		--dest-namespace default
 	argocd app sync nginx
 
+argo-create-web-app-umbrella:
+	argocd app create web-app-umbrella \
+		--repo https://github.com/luizamboni/k3d-argocd-study.git \
+		--path web-app-umbrella \
+		--dest-server https://kubernetes.default.svc \
+		--dest-namespace default \
+		--sync-policy automated
+	argocd app sync web-app-umbrella
+
 argo-create-guestbook-with-ingress:
 	argocd app create guestbook-with-ingress \
 		--repo https://github.com/luizamboni/k3d-argocd-study.git \
