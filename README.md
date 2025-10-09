@@ -33,6 +33,7 @@ make argo-login
 make argo-create-nginx-service
 make argo-create-guestbook-with-ingress
 make argo-create-web-app-umbrella
+# It will run a wiremock, you can check it out on: http://localhost:8081/umbrella/__admin/mappings
 ```
 <!-- 
 # Helm

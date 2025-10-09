@@ -12,7 +12,7 @@ web-app:
       ingress.kubernetes.io/ssl-redirect: "false"
     hosts:
       - paths:
-          - path: /mock
+          - path: /umbrella/
             pathType: Prefix
     tls: []
   wiremock:
@@ -22,7 +22,7 @@ web-app:
       {
         "request": {
           "method": "GET",
-          "urlPath": "/mock/hello"
+          "urlPath": "/umbrella/hello"
         },
         "response": {
           "status": 200,
