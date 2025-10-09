@@ -11,7 +11,8 @@ web-app:
     annotations:
       ingress.kubernetes.io/ssl-redirect: "false"
     hosts:
-      - paths:
+      - host: localhost
+        paths:
           - path: /umbrella/
             pathType: Prefix
     tls: []
